@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Lookup Redirector</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-color: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-color: #2962FF;
+            --input-bg: #2d2d2d;
+            --input-border: #3d3d3d;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(90deg, #2962FF, #720e9e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+        }
+        
+        .instructions {
+            margin: 15px 0 25px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 15px;
+        }
+        
+        .search-container {
+            margin: 25px 0;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        #stock-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+        }
+        
+        #stock-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        #stock-input::placeholder {
+            color: #555;
+        }
+        
+        #search-btn {
+            padding: 0 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        #suggest-btn {
+            padding: 0 20px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        #search-btn:hover, #suggest-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        #search-btn:active, #suggest-btn:active {
+            transform: translateY(0);
+        }
+        
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        
+        .redirect-btn {
+            padding: 14px 0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .redirect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0.95;
+        }
+        
+        .redirect-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* New button style with outline */
+        .redirect-btn.outline {
+            background-color: transparent;
+            border: 2px solid;
+            box-shadow: none;
+        }
+        
+        .redirect-btn.outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .tradingview {
+            background-color: #2962FF;
+        }
+        .tradingview.outline {
+            border-color: #2962FF;
+            color: #2962FF;
+        }
+        .yahoo {
+            background-color: #720e9e;
+        }
+        .yahoo.outline {
+            border-color: #720e9e;
+            color: #720e9e;
+        }
+        .screener {
+            background-color: #0d6e0d;
+        }
+        .screener.outline {
+            border-color: #0d6e0d;
+            color: #0d6e0d;
+        }
+        .nse {
+            background-color: #ff8147;
+        }
+        .nse.outline {
+            border-color: #ff8147;
+            color: #ff8147;
+        }
+        .bing {
+            background-color: #0078D4;
+        }
+        .bing.outline {
+            border-color: #0078D4;
+            color: #0078D4;
+        }
+        .bing-chat {
+            background-color: #ab70ad;
+        }
+        .bing-chat.outline {
+            border-color: #ab70ad;
+            color: #ab70ad;
+        }
+        .bing-chat-technical {
+            background-color: #9f4ed4;
+        }
+        .bing-chat-technical.outline {
+            border-color: #9f4ed4;
+            color: #9f4ed4;
+        }
+        .tradingview-news {
+            background-color: #00306e;
+        }
+        .tradingview-news.outline {
+            border-color: #00306e;
+            color: #00306e;
+        }
+        .perplexity {
+            background-color: #2e2e2e;
+        }
+        .perplexity.outline {
+            border-color: #2e2e2e;
+            color: #2e2e2e;
+        }
+        .google {
+            background-color: #4285F4;
+        }
+        .google.outline {
+            border-color: #4285F4;
+            color: #4285F4;
+        }
+        .google-analysis {
+            background-color: #4285F4;
+        }
+        .google-analysis.outline {
+            border-color: #4285F4;
+            color: #4285F4;
+        }
+        .trendlyne {
+            background-color: #037e74;
+        }
+        .trendlyne.outline {
+            border-color: #037e74;
+            color: #037e74;
+        }
+        .perplexityf {
+            background-color: #787878;
+        }
+        .perplexityf.outline {
+            border-color: #787878;
+            color: #787878;
+        }
+        .copilot-news {
+            background-color: #0078D4;
+        }
+        .copilot-news.outline {
+            border-color: #0078D4;
+            color: #0078D4;
+        }
+        .perplexity-news {
+            background-color: #2e2e2e;
+        }
+        .perplexity-news.outline {
+            border-color: #2e2e2e;
+            color: #2e2e2e;
+        }
+        .test {
+    background-color: #87c8d6;
+}
+.test.outline {
+    border-color: #87c8d6;
+    color: #87c8d6;
+}
+        
+        /* Widget containers styles */
+        .widgets-container {
+            margin-top: 30px;
+            display: none; /* Hidden by default */
+        }
+        
+        .widget-container {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .widget-container:last-child {
+            margin-bottom: 0;
+        }
+        
+        .widget-container h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 20px;
+            text-align: center;
+        }
+        
+        /* Trading Widget styles */
+        .trading-widget-container {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .trading-widget-container h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 20px;
+            text-align: center;
+        }
+        
+        .sc-embed {
+            width: 100%;
+            min-height: 300px;
+            background-color: var(--card-color);
+            border-radius: 12px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        
+        /* Fix for Trendlyne widgets */
+        .trendlyne-widgets {
+            width: 100% !important;
+            overflow: visible !important;
+        }
+        
+        /* Fix for SWOT widget expand buttons */
+        .tl-widgets-swot__item {
+            overflow: visible !important;
+        }
+        
+        .tl-widgets-swot__item-content {
+            max-height: none !important;
+        }
+        
+        /* Recent searches styles */
+        .recent-searches {
+            margin-bottom: 20px;
+        }
+        
+        .recent-title {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .recent-title i {
+            margin-right: 6px;
+        }
+        
+        .recent-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .recent-item {
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .recent-item:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+        
+        .show-more-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 6px 0;
+            margin-left: 8px;
+        }
+        
+        .hidden-items {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .button-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            body {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            #search-btn, #suggest-btn {
+                padding: 0 15px;
+            }
+        }
+        .paste-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .paste-notification.show {
+            opacity: 1;
+        }
+        
+        /* Add this for datalist styling */
+        #stock-symbols {
+            display: none;
+        }
+        
+        /* Style for datalist dropdown suggestions */
+        input[list]::-webkit-calendar-picker-indicator {
+            display: none !important;
+        }
+        
+        /* Copy prompt button */
+        .copy-prompt-btn {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-prompt-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Stock symbol suggestions datalist -->
+    <datalist id="stock-symbols">
+        <option value="360ONE">
+<option value="3MINDIA">
+<option value="ABB">
+<option value="ACC">
+<option value="ZYDUSLIFE">
+<option value="ECLERX">
+
+
+        <!-- Add more symbols below this line as needed -->
+    </datalist>
+</head>
+<body>
+    <div class="card">
+        <h1>Stock Lookup Redirector</h1>
+        <p class="instructions">Enter any NSE stock symbol to view it on different financial platforms</p>
+        
+        <div class="search-container">
+            <div class="input-group">
+                <input type="text" 
+                       id="stock-input" 
+                       placeholder="Enter stock symbol (e.g., TCS, RELIANCE, INFY)" 
+                       autocomplete="off"
+                       list="stock-symbols">
+                <button id="search-btn" title="Search"><i class="fas fa-search"></i></button>
+                <button id="suggest-btn" title="Symbol Suggestions"><i class="fab fa-google"></i></button>
+            </div>
+            
+            <!-- Recent searches section -->
+            <div class="recent-searches" id="recent-searches">
+                <div class="recent-title">
+                    <i class="fas fa-history"></i>
+                    <span>Recent searches:</span>
+                    <button class="show-more-btn" id="show-more-btn">Show more</button>
+                </div>
+                <div class="recent-list" id="recent-list">
+                    <!-- Recent items will be added here by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <a href="#" class="redirect-btn tradingview" id="tv-btn">TradingView</a>
+                <a href="#" class="redirect-btn bing-chat" id="bing-chat-btn">Bing Copilot</a>
+                <a href="#" class="redirect-btn bing-chat-technical" id="bing-chat-technical-btn">Bing Chat Technical</a>
+                <a href="#" class="redirect-btn perplexity" id="perplexity-btn">perplexity Ai</a>
+                <a href="#" class="redirect-btn perplexityf" id="perplexityf-btn">perplexity Finance</a>
+
+
+                
+                <!-- New buttons with outline style -->
+                <a href="#" class="redirect-btn copilot-news outline" id="copilot-news-btn">Copilot News</a>
+                <a href="#" class="redirect-btn perplexity-news outline" id="perplexity-news-btn">Perplexity News</a>
+                
+                                <a href="#" class="redirect-btn tradingview-news" id="tv-news-btn">TradingView News</a>
+                
+                <a href="#" class="redirect-btn trendlyne" id="trendlyne-btn">Trendlyne</a>
+                <a href="#" class="redirect-btn screener" id="sc-btn">Screener.in</a>
+                <a href="#" class="redirect-btn yahoo" id="yf-btn">Yahoo Finance</a>
+                
+                <a href="#" class="redirect-btn nse" id="nse-btn">NSE India</a>
+                
+                <a href="#" class="redirect-btn bing" id="bing-btn">Bing Search</a>
+                <a href="#" class="redirect-btn google" id="google-btn">Google Search</a> 
+                <a href="#" class="redirect-btn google-analysis" id="google-analysis-btn">Google Analysis</a> 
+                <a href="#" class="redirect-btn test" id="test-btn">Test</a>
+                
+            </div>
+            
+            <!-- Copy prompt button -->
+            <button class="copy-prompt-btn" id="copy-prompt-btn">
+                <i class="fas fa-copy"></i> copy prompt
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Trading Widget container -->
+    <div class="card trading-widget-container" id="trading-widget-container">
+        <h2>Trading Widget for <span id="trading-widget-symbol"></span></h2>
+        <div id="trading-widget-placeholder"></div>
+    </div>
+
+
+    <!-- Widgets container -->
+    <div class="widgets-container" id="widgets-container">
+        <!-- Checklist Widget -->
+        <div class="widget-container" id="checklist-container">
+            <h2>Checklist for <span id="checklist-symbol"></span></h2>
+            <div id="checklist-widget-placeholder"></div>
+        </div>
+        
+        <!-- SWOT Widget -->
+        <div class="widget-container" id="swot-container">
+            <h2>SWOT Analysis for <span id="swot-symbol"></span></h2>
+            <div id="swot-widget-placeholder"></div>
+        </div>
+    </div>
+    
+    <div class="paste-notification" id="paste-notification">
+        <!-- This will show different messages based on context -->
+    </div>
+
+
+    <script>
+    // Get elements
+    const stockInput = document.getElementById('stock-input');
+    const searchBtn = document.getElementById('search-btn');
+    const suggestBtn = document.getElementById('suggest-btn');
+    const tvBtn = document.getElementById('tv-btn');
+    const yfBtn = document.getElementById('yf-btn');
+    const scBtn = document.getElementById('sc-btn');
+    const nseBtn = document.getElementById('nse-btn');
+    const bingBtn = document.getElementById('bing-btn');
+    const bingChatBtn = document.getElementById('bing-chat-btn');
+    const bingChatTechnicalBtn = document.getElementById('bing-chat-technical-btn');
+    const tvNewsBtn = document.getElementById('tv-news-btn');
+    const perplexityBtn = document.getElementById('perplexity-btn');
+    const googleBtn = document.getElementById('google-btn');
+    const trendlyneBtn = document.getElementById('trendlyne-btn');
+    const perplexityfBtn = document.getElementById('perplexityf-btn');
+    const copilotNewsBtn = document.getElementById('copilot-news-btn');
+    const perplexityNewsBtn = document.getElementById('perplexity-news-btn');
+    const googleAnalysisBtn = document.getElementById('google-analysis-btn');
+    const widgetsContainer = document.getElementById('widgets-container');
+    const recentSearchesContainer = document.getElementById('recent-searches');
+    const recentList = document.getElementById('recent-list');
+    const showMoreBtn = document.getElementById('show-more-btn');
+    const pasteNotification = document.getElementById('paste-notification');
+    const copyPromptBtn = document.getElementById('copy-prompt-btn');
+    
+    // Widget elements
+    const checklistContainer = document.getElementById('checklist-container');
+    const checklistSymbol = document.getElementById('checklist-symbol');
+    const checklistPlaceholder = document.getElementById('checklist-widget-placeholder');
+    const swotContainer = document.getElementById('swot-container');
+    const swotSymbol = document.getElementById('swot-symbol');
+    const swotPlaceholder = document.getElementById('swot-widget-placeholder');
+
+
+    // Trading Widget elements
+    const tradingWidgetContainer = document.getElementById('trading-widget-container');
+    const tradingWidgetSymbol = document.getElementById('trading-widget-symbol');
+    const tradingWidgetPlaceholder = document.getElementById('trading-widget-placeholder');
+    const testBtn = document.getElementById('test-btn');
+
+
+
+
+    // Recent searches array
+    let recentSearches = JSON.parse(localStorage.getItem('recentStockSearches')) || [];
+    let showAllRecent = false;
+
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        updateRecentSearchesDisplay();
+        loadTradingWidget();
+    });
+
+
+    // Add event listeners
+    stockInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    });
+    
+    searchBtn.addEventListener('click', function() {
+        handleSearch();
+    });
+    
+    suggestBtn.addEventListener('click', function() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.google.com/finance/quote/${symbol}`, '_blank');
+    });
+    
+    showMoreBtn.addEventListener('click', function() {
+        showAllRecent = !showAllRecent;
+        updateRecentSearchesDisplay();
+    });
+
+
+    // Button event listeners
+    tvBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToTradingView();
+    });
+    yfBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToYahooFinance();
+    });
+    scBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToScreener();
+    });
+    nseBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToNSE();
+    });
+    bingBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToBing();
+    });
+    bingChatBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToBingChat();
+    });
+    bingChatTechnicalBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToBingChatTechnical();
+    });
+    tvNewsBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToTradingViewNews();
+    });
+    perplexityBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToperplexity();
+    });
+    googleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToGoogle();
+    });
+    trendlyneBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToTrendlyne();
+    });
+    perplexityfBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToperplexityf();
+    });
+    copilotNewsBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToCopilotNews();
+    });
+    perplexityNewsBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToPerplexityNews();
+    });
+    googleAnalysisBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        redirectToGoogleAnalysis();
+    });
+    testBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    redirectToTest();
+});
+
+
+    // Copy prompt button click handler
+    copyPromptBtn.addEventListener('click', function() {
+        const symbol = getStockSymbol() || 'SYMBOL';
+        const prompt = `Act as a professional stock market analyst and investment advisor.  
+Analyze NSE:${symbol} from every important angle for both short-term trading and long-term investment.  
+Give me the analysis in a structured way covering the following:  
+
+
+1. **Company Overview** – brief business model, sector, market positioning.  
+
+
+2. **Recent News & Events** – highlight positive 🟢, negative 🔴, or neutral/caution 🟡 updates in the last 3–6 months (company-specific + sector + economy).  
+
+
+3. **Fundamental Analysis** –  
+   - Revenue, Profit, EPS growth (YoY & QoQ).  
+   - ROE, ROCE, Debt levels, Dividend policy.  
+   - Valuation: P/E, P/B, PEG compared to sector peers.  
+   - Promoter holding & FII/DII trend.  
+
+
+4. **Technical Analysis** –  
+   - Current trend (bullish/bearish/sideways).  
+   - Key indicators: RSI, MACD, EMA (20/50/200), Bollinger Bands, Volume action.  
+   - Support & Resistance levels.  
+   - Short-term vs. long-term chart pattern.  
+
+
+5. **Financial Health & Risk Factors** – liquidity, debt, sector challenges, regulatory risks.  
+
+
+6. **Peer Comparison** – compare with top 2–3 competitors in NSE.  
+
+
+7. **Sector & Macro View** – how the overall sector and Indian/global economy may impact this stock.  
+
+
+8. **Final Verdict** – clear recommendation for:  
+   - **Short-term (swing/positional trading)**: Buy/Hold/Wait/Sell/Avoid with price range & stop-loss.  
+   - **Long-term investment (1–5 years)**: Buy/Hold/Sell with reasoning.  
+   - Mention risk level: Low / Medium / High.  
+
+
+9. **Optional AI Insights** – identify if this stock shows traits of:  
+   - Multibagger potential  
+   - Value trap  
+   - Momentum play  
+   - Dividend play  
+   - Defensive stock  
+
+
+Make sure analysis is **balanced, fact-based, and easy to understand** with reasoning for each signal.  
+Use symbols (🟢, 🔴, 🟡) where relevant.  
+`;
+        
+        // Modern clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(prompt)
+                .then(() => {
+                    showNotification('Prompt copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    fallbackCopyText(prompt);
+                });
+        } else {
+            // Fallback method
+            fallbackCopyText(prompt);
+        }
+    });
+
+
+    function handleSearch() {
+        const input = stockInput.value.trim();
+        
+        // Check if input contains multiple symbols
+        if (input.includes('\n') || input.split(/[\s,]+/).length > 1) {
+            processMultipleSymbols(input);
+            return;
+        }
+        
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        
+        addToRecentSearches(symbol, true);
+        loadTradingWidget();
+        loadTrendlyneWidgets();
+    }
+
+
+    function processMultipleSymbols(input) {
+        const symbols = input.split(/[\n\s,]+/)
+            .map(s => s.trim().toUpperCase())
+            .filter(s => s.length > 0);
+        
+        if (symbols.length === 0) return;
+        
+        symbols.forEach(symbol => {
+            const correctedSymbol = getStockSymbol(symbol);
+            if (correctedSymbol) {
+                addToRecentSearches(correctedSymbol, false);
+            }
+        });
+        
+        showNotification(`Added ${symbols.length} symbols to recent searches`);
+        stockInput.value = '';
+    }
+
+
+    function showNotification(message) {
+        pasteNotification.textContent = message;
+        pasteNotification.classList.add('show');
+        
+        setTimeout(() => {
+            pasteNotification.classList.remove('show');
+        }, 3000);
+    }
+
+
+    function addToRecentSearches(symbol, isSingle) {
+        recentSearches = recentSearches.filter(item => item !== symbol);
+        recentSearches.unshift(symbol);
+        
+        if (isSingle && recentSearches.length > 10) {
+            recentSearches = recentSearches.slice(0, 10);
+        }
+        
+        localStorage.setItem('recentStockSearches', JSON.stringify(recentSearches));
+        updateRecentSearchesDisplay();
+    }
+
+
+    function updateRecentSearchesDisplay() {
+        recentList.innerHTML = '';
+        
+        if (recentSearches.length === 0) {
+            recentSearchesContainer.style.display = 'none';
+            return;
+        }
+        
+        recentSearchesContainer.style.display = 'block';
+        const itemsToShow = showAllRecent ? recentSearches.length : Math.min(5, recentSearches.length);
+        
+        if (recentSearches.length > 5) {
+            showMoreBtn.textContent = showAllRecent ? 'Show less' : 'Show more';
+            showMoreBtn.style.display = 'inline';
+        } else {
+            showMoreBtn.style.display = 'none';
+        }
+        
+        for (let i = 0; i < itemsToShow; i++) {
+            const symbol = recentSearches[i];
+            const item = document.createElement('div');
+            item.className = 'recent-item';
+            item.textContent = symbol;
+            item.addEventListener('click', function() {
+                stockInput.value = symbol;
+                loadTradingWidget();
+                loadTrendlyneWidgets();
+            });
+            recentList.appendChild(item);
+        }
+    }
+
+
+    function getStockSymbol(input) {
+        if (!input) input = stockInput.value.trim().toUpperCase();
+        if (!input) return null;
+        const corrections = {
+            'RELIANCE': 'RELIANCE',
+            'TATASTEAL': 'TATASTEEL',
+            'INFO': 'INFY',
+            'HDFCBAN': 'HDFCBANK'
+        };
+        return corrections[input] || input;
+    }
+
+
+    // Fallback method for copying text
+    function fallbackCopyText(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        
+        // Avoid scrolling to bottom
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showNotification('Prompt copied to clipboard!');
+            }
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err);
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
+
+    // Ensure embed.js is loaded before calling .load()
+    function ensureEmbedScriptLoaded(callback) {
+        if (window.scEmbedController && typeof window.scEmbedController.load === 'function') {
+            callback();
+        } else {
+            if (!document.getElementById('sc-embed-script')) {
+                const script = document.createElement('script');
+                script.id = 'sc-embed-script';
+                script.src = 'https://www.gateway-tt.in/assets/embed.js';
+                script.async = true;
+                script.onload = () => {
+                    if (window.scEmbedController && typeof window.scEmbedController.load === 'function') {
+                        callback();
+                    } else {
+                        console.error("scEmbedController still not available after script load.");
+                    }
+                };
+                script.onerror = () => {
+                    console.error("Failed to load trading widget script.");
+                };
+                document.body.appendChild(script);
+            }
+        }
+    }
+
+
+    function loadTradingWidget() {
+        const symbol = getStockSymbol();
+        if (!symbol) {
+            tradingWidgetContainer.style.display = 'none';
+            return;
+        }
+
+
+        tradingWidgetSymbol.textContent = symbol;
+        tradingWidgetPlaceholder.innerHTML = '';
+
+
+        const container = document.createElement('div');
+        container.id = 'trading-widget-container-' + Date.now();
+
+
+        const tradingWidget = document.createElement('p');
+        tradingWidget.className = 'sc-embed';
+        tradingWidget.setAttribute('data-width', '300px');
+        tradingWidget.setAttribute('data-orders', encodeURIComponent(JSON.stringify([{ quantity: 10, ticker: symbol }])));
+        tradingWidget.setAttribute('data-cardsize', 'small');
+        tradingWidget.setAttribute('data-withtt', 'true');
+        tradingWidget.setAttribute('data-withsearch', 'true');
+        tradingWidget.innerHTML = `<strong>loading widget to trade ${symbol}</strong>`;
+
+
+        container.appendChild(tradingWidget);
+        tradingWidgetPlaceholder.appendChild(container);
+
+
+        ensureEmbedScriptLoaded(() => {
+            window.scEmbedController.load();
+        });
+
+
+        tradingWidgetContainer.style.display = 'block';
+    }
+
+
+    function loadTrendlyneWidgets() {
+        const symbol = getStockSymbol();
+        if (!symbol) {
+            widgetsContainer.style.display = 'none';
+            return;
+        }
+        
+        checklistSymbol.textContent = symbol;
+        swotSymbol.textContent = symbol;
+        checklistPlaceholder.innerHTML = '';
+        swotPlaceholder.innerHTML = '';
+        
+        const checklistWidget = document.createElement('blockquote');
+        checklistWidget.className = 'trendlyne-widgets';
+        checklistWidget.setAttribute('data-get-url', `https://trendlyne.com/web-widget/checklist-widget/Poppins/${symbol}/?posCol=00A25B&primaryCol=006AFF&negCol=EB3B00&neuCol=F7941E`);
+        checklistWidget.setAttribute('data-theme', 'light');
+        checklistPlaceholder.appendChild(checklistWidget);
+        
+        const swotWidget = document.createElement('blockquote');
+        swotWidget.className = 'trendlyne-widgets';
+        swotWidget.setAttribute('data-get-url', `https://trendlyne.com/web-widget/swot-widget/Poppins/${symbol}/?posCol=00A25B&primaryCol=006AFF&negCol=EB3B00&neuCol=F7941E`);
+        swotWidget.setAttribute('data-theme', 'light');
+        swotPlaceholder.appendChild(swotWidget);
+        
+        const oldScript = document.querySelector('script[src="https://cdn-static.trendlyne.com/static/js/webwidgets/tl-widgets.js"]');
+        if (oldScript) oldScript.remove();
+        
+        const script = document.createElement('script');
+        script.src = 'https://cdn-static.trendlyne.com/static/js/webwidgets/tl-widgets.js';
+        script.async = true;
+        script.charset = 'utf-8';
+        script.onload = function() {
+            setTimeout(() => {
+                updateTrendlyneButtonLink();
+            }, 1000);
+        };
+        document.body.appendChild(script);
+        
+        widgetsContainer.style.display = 'block';
+    }
+
+
+    function updateTrendlyneButtonLink() {
+        const poweredByLink = swotPlaceholder.querySelector('.powered_by_container');
+        if (poweredByLink && poweredByLink.href) {
+            trendlyneBtn.href = poweredByLink.href;
+        } else {
+            const symbol = getStockSymbol();
+            trendlyneBtn.href = `https://trendlyne.com/equity/${symbol}/`;
+        }
+    }
+
+
+    function redirectToTradingView() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.tradingview.com/chart/?symbol=NSE%3A${symbol}`, '_blank');
+    }
+
+
+    function redirectToYahooFinance() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://finance.yahoo.com/quote/${symbol}.NS/`, '_blank');
+    }
+
+
+    function redirectToScreener() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.screener.in/company/${symbol}/consolidated/`, '_blank');
+    }
+
+
+    function redirectToNSE() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.nseindia.com/get-quotes/equity?symbol=${symbol}`, '_blank');
+    }
+
+
+    function redirectToBing() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.bing.com/copilotsearch?q=NSE:+${symbol}`, '_blank');
+    }
+
+
+    function redirectToBingChat() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.bing.com/chat?q=Give+a+detailed+NSE+stock+analysis+for+${symbol}.+Include+an+easy-to-read+overview,+financial+health+(cash+flow,+balance+sheet+highlights),+shareholding+pattern,+and+future+growth+projections.+Provide+a+Buy+/+Sell+/+Hold+verdict+with+clear+reasoning.+Present+insights+in+a+graphical/visual+style+(tables,+colors,+icons)+so+that+decisions+can+be+made+quickly.+Keep+it+concise+but+deep+enough+for+investment+clarity.&sendquery=1&FORM=SCCODX`, '_blank');
+    }
+
+
+    function redirectToBingChatTechnical() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.bing.com/chat?prompt=Perform+a+detailed+technical+analysis+for+swing+trading+of+NSE:${symbol}+using+recent+daily+and+weekly+chart+data.+show+current+price+of+stock.+Identify+and+describe+key+indicators+such+as:+Moving+averages+(20/50/200+EMA)+–+show+crossover+signals+and+overall+trend+direction.+RSI+and+MACD+–+check+for+momentum+strength,+divergence,+or+overbought/oversold+zones.+Support+and+resistance+levels+–+highlight+recent+breakouts+or+retests.+Volume+trend+–+mention+whether+accumulation+or+distribution+is+visible.+Candlestick+patterns+–+highlight+any+reversal+or+continuation+setup+(like+bullish+engulfing,+hammer,+or+doji).+Sort+findings+by+technical+importance+(strongest+to+weakest+signals)+and+use+visual+sentiment+markers:🟢+Bullish+indication🟡+Neutral+or+indecisive+setup🔴+Bearish+signal+Conclude+with+a+swing+trading+outlook+(Bullish+🟢+/+Neutral+🟡+/+Bearish+🔴)+and+specify+possible+entry,+target,+and+stop-loss+zones+based+on+chart+structure.&sendquery=1&FORM=SCCODX`, '_blank');
+    }
+
+
+    function redirectToTradingViewNews() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://in.tradingview.com/news-flow/?symbol=NSE:${symbol}`, '_blank');
+    }
+
+
+    function redirectToperplexity() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.perplexity.ai/?q=Give+a+detailed+NSE+stock+analysis+for+${symbol}.+Include+an+easy-to-read+overview,+financial+health+(cash+flow,+balance+sheet+highlights),+shareholding+pattern,+and+future+growth+projections.+Provide+a+Buy+/+Sell+/+Hold+verdict+with+clear+reasoning.+Present+insights+in+a+graphical/visual+style+(tables,+colors,+icons)+so+that+decisions+can+be+made+quickly.+Keep+it+concise+but+deep+enough+for+investment+clarity.`, '_blank');
+    }
+
+
+    function redirectToGoogle() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.google.com/search?udm=50&aep=11&q=Check+if+there+is+any+recent+news+(positive+🟢,+neutral+🟡+and+negative+🔴)+related+to+NSE:${symbol}+that+could+impact+the+stock+in+the+short+term+or+long+term+and+sort+with+date+descending+order.+Also,+highlight+any+significant+past+news/events+that+influenced+its+performance.Additionally,+analyze+sector-related+news+and+give+a+final+verdict.(Use+color+symbols:+🔴+for+negative,+🟢+for+positive,+🟡+for+neutral/caution)`, '_blank');
+    }
+
+
+    function redirectToTrendlyne() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(trendlyneBtn.href, '_blank');
+    }
+
+
+    function redirectToperplexityf() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.perplexity.ai/finance/${symbol}.NS`, '_blank');
+    }
+
+
+    function redirectToCopilotNews() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.bing.com/chat?q=Check+if+there+is+any+recent+news+(positive+🟢,+neutral+🟡+and+negative+🔴)+related+to+NSE:${symbol}+that+could+impact+the+stock+in+the+short+term+or+long+term+and+sort+with+date+descending+order.+Also,+highlight+any+significant+past+news/events+that+influenced+its+performance.Additionally,+analyze+sector-related+news+and+give+a+final+verdict.(Use+color+symbols:+🔴+for+negative,+🟢+for+positive,+🟡+for+neutral/caution).&sendquery=1&FORM=SCCODX`, '_blank');
+    }
+
+
+    function redirectToPerplexityNews() {
+        const symbol = getStockSymbol();
+        if (!symbol) return;
+        window.open(`https://www.perplexity.ai/?q=Check+if+there+is+any+recent+news+(positive+🟢,+neutral+🟡+and+negative+🔴)+related+to+NSE:${symbol}+that+could+impact+the+stock+in+the+short+term+or+long+term+and+sort+with+date+descending+order.+Also,+highlight+any+significant+past+news/events+that+influenced+its+performance.Additionally,+analyze+sector-related+news+and+give+a+final+verdict.(Use+color+symbols:+🔴+for+negative,+🟢+for+positive,+🟡+for+neutral/caution).`, '_blank');
+    }
+    function redirectToTest() {
+    const symbol = getStockSymbol();
+    if (!symbol) return;
+    window.open(`https://www.google.com/search?udm=50&aep=11&q=Check+if+there+are+any+recent+or+upcoming+earnings+results,+earnings+calls,+or+analyst+expectations+related+to+NSE:${symbol}.+Summarize+quarterly/annual+results+with+key+metrics:+revenue,+EBITDA/EBIT,+PAT,+EPS,+margins,+guidance.+Compare+actual+results+with+analyst/market+expectations+(beat+🟢,+inline+🟡,+miss+🔴).+Highlight+management+commentary+or+outlook+from+earnings+calls.+Mention+any+revisions+in+analyst+ratings/target+price+post+results.+Include+historical+earnings+surprises+or+notable+past+earnings+events+that+impacted+the+stock.+Also,+analyze+peer/sector+earnings+trends+to+put+results+in+context.+Conclude+with+a+final+verdict+on+earnings+impact+for+the+stock’s+short-term+and+long-term+view.+(Use+color+symbols:+🟢+Positive,+🟡+Neutral/Caution,+🔴+Negative)`, '_blank');
+}
+    function redirectToGoogleAnalysis() {
+    const symbol = getStockSymbol();
+    if (!symbol) return;
+    window.open(`https://www.google.com/search?udm=50&aep=11&q=Perform+a+detailed+technical+analysis+for+swing+trading+of+NSE:${symbol}+using+recent+daily+and+weekly+chart+data.+show+current+price+of+stock.+Identify+and+describe+key+indicators+such+as:+Moving+averages+(20/50/200+EMA)+–+show+crossover+signals+and+overall+trend+direction.+RSI+and+MACD+–+check+for+momentum+strength,+divergence,+or+overbought/oversold+zones.+Support+and+resistance+levels+–+highlight+recent+breakouts+or+retests.+Volume+trend+–+mention+whether+accumulation+or+distribution+is+visible.+Candlestick+patterns+–+highlight+any+reversal+or+continuation+setup+(like+bullish+engulfing,+hammer,+or+doji).+Sort+findings+by+technical+importance+(strongest+to+weakest+signals)+and+use+visual+sentiment+markers:🟢+Bullish+indication🟡+Neutral+or+indecisive+setup🔴+Bearish+signal+Conclude+with+a+swing+trading+outlook+(Bullish+🟢+/+Neutral+🟡+/+Bearish+🔴)+and+specify+possible+entry,+target,+and+stop-loss+zones+based+on+chart+structure.`, '_blank');
+}
+    </script>
+</body>
+</html>
